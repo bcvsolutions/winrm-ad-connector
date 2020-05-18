@@ -104,8 +104,8 @@
   <repositories>
     <repository>
       <id>nexus</id>
-      <name>BCV Staging repo</name>
-      <url>https://nexus.bcvsolutions.eu/repository/maven-releases/</url>
+      <name>BCV Nexus public repo</name>
+      <url>https://nexus.bcvsolutions.eu/repository/maven-public-releases/</url>
     </repository>
   </repositories>
 
