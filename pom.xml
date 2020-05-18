@@ -262,6 +262,10 @@
       <name>Nexus Staging repo</name>
       <url>https://nexus.bcvsolutions.eu/repository/maven-releases/</url>
     </repository>
+      <id>nexus-snapshots</id>
+      <name>BCV Nexus snapshot repo</name>
+      <url>https://nexus.bcvsolutions.eu/repository/maven-snapshots/</url>
+    </snapshotRepository>
   </distributionManagement>
 
 </project>
