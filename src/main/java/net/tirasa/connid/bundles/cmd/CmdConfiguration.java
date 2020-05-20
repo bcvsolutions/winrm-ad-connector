@@ -458,7 +458,7 @@ public class CmdConfiguration extends ADConfiguration {
 			try {
 				new LdapName(each);
 			} catch (InvalidNameException var8) {
-				throw new ConfigurationException("The base context to synchronize " + each + " cannot be parsed");
+				throw new ConfigurationException("The base context to synchronize " + each + " cannot be parsed", var8);
 			}
 		}
 	}

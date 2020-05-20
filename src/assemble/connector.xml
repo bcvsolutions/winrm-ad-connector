@@ -39,7 +39,7 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>net.tirasa.connid.bundles:net.tirasa.connid.bundles.ad</include>
+        <include>eu.bcvsolutions.idm.connector.ad:ad-connector</include>
       </includes>
       <outputDirectory>lib</outputDirectory>
     </dependencySet>
