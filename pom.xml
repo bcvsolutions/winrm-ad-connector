@@ -28,7 +28,7 @@
     
   <groupId>eu.bcvsolutions.idm.connector.winrm-ad</groupId>
   <artifactId>winrm-ad-connector</artifactId>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.4</version>
   <name>WinRM + AD connector</name>
   <packaging>jar</packaging>
 
