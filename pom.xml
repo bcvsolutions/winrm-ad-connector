@@ -28,7 +28,7 @@
     
   <groupId>eu.bcvsolutions.idm.connector.winrm-ad</groupId>
   <artifactId>winrm-ad-connector</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5-SNAPSHOT</version>
   <name>WinRM + AD connector</name>
   <packaging>jar</packaging>
 
@@ -71,20 +71,20 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.9.8</version>
+      <version>2.11.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.9.8</version>
+      <version>2.11.0</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.9.8</version>
+      <version>2.11.0</version>
     </dependency>
 
     <!-- TEST -->

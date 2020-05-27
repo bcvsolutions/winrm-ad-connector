@@ -1,5 +1,10 @@
 # CHANGELOG
 
+##### TODO - [1.0.5]
+* new versions of com.fasterxml.jackson.core libs. jackson-databind had some vulnerability in version 2.9.8. We used this opportunity
+to update all jackson dependencies to latest versions
+
+
 ##### 15.04.2020 - [1.0.4]
 * New feature of configuration options for WinRM service, path to powershell scripts, which type of connection will be used and 
 in which order. Added option to use connector in multi-domain environment.
