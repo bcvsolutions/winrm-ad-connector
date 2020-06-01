@@ -508,6 +508,8 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 		attributes.add(AttributeBuilder.build("authentication", cmdConfiguration.getAuthenticationSchema()));
 		attributes.add(AttributeBuilder.build("user", cmdConfiguration.getUser()));
 		attributes.add(AttributeBuilder.build("password", getPassword(cmdConfiguration.getPassword())));
+		attributes.add(AttributeBuilder.build("caTrustPath", cmdConfiguration.getCaTrustPath()));
+		attributes.add(AttributeBuilder.build("ignoreCaValidation", cmdConfiguration.isIgnoreCaValidation()));
 		return attributes;
 	}
 
