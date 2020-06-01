@@ -125,7 +125,9 @@ public abstract class CmdExec {
 			String output = getInputStream(proc.getInputStream());
 			LOG.info("Script output:\n{0}", output);
 			String error = getInputStream(proc.getErrorStream());
-			LOG.error("Script error:\n{0}", error);
+			if(!StringUtil.isBlank(error)) {
+				LOG.error("Script error:\n{0}", error);
+			}
 
 			if (proc.exitValue() != 0) {
 				throw new ConnectorException("Script ended with exit code: " + proc.exitValue() + " error: " + error);
