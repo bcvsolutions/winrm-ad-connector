@@ -103,7 +103,8 @@ def executeScript(endpoint, authentication, user, password, ca_trust_path, ignor
         # Encode cmd powershell
         encodedCmd = encode(cmd)
 
-        if ignore_validation == True:
+        if ignore_validation == "true":
+            writeLog("Connecting without cert validation")
             p = winrm.protocol.Protocol(
                 endpoint=endpoint,
                 transport=authentication,
