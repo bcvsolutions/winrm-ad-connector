@@ -375,32 +375,32 @@ public class CmdConfiguration extends ADConfiguration {
 	@Override
 	public void validate() {
 		if (isCreateViaWinRM() || isUpdateViaWinRM() || isDeleteViaWinRM() || isSearchViaWinRM() || isTestViaWinRM()) {
-			if (StringUtil.isBlank(createCmdPath)) {
-				throw new ConfigurationException("Create cmd path must not be blank!");
+			if (createViaWinRM && StringUtil.isBlank(createCmdPath)) {
+				throw new ConfigurationException("Create path must not be blank!");
 			}
-			if (StringUtil.isBlank(createPsPath)) {
-				throw new ConfigurationException("Create ps path must not be blank!");
+			if (createViaWinRM && StringUtil.isBlank(createPsPath)) {
+				throw new ConfigurationException("Create PS path must not be blank!");
 			}
-			if (StringUtil.isBlank(updateCmdPath)) {
-				throw new ConfigurationException("Update cmd path must not be blank!");
+			if (updateViaWinRM && StringUtil.isBlank(updateCmdPath)) {
+				throw new ConfigurationException("Update path must not be blank!");
 			}
-			if (StringUtil.isBlank(updatePsPath)) {
-				throw new ConfigurationException("Update ps path must not be blank!");
+			if (updateViaWinRM && StringUtil.isBlank(updatePsPath)) {
+				throw new ConfigurationException("Update PS path must not be blank!");
 			}
-			if (StringUtil.isBlank(searchCmdPath)) {
-				throw new ConfigurationException("Search cmd path must not be blank!");
+			if (searchViaWinRM && StringUtil.isBlank(searchCmdPath)) {
+				throw new ConfigurationException("Search path must not be blank!");
 			}
-			if (StringUtil.isBlank(searchPsPath)) {
-				throw new ConfigurationException("Search ps path must not be blank!");
+			if (searchViaWinRM && StringUtil.isBlank(searchPsPath)) {
+				throw new ConfigurationException("Search PS path must not be blank!");
 			}
-			if (StringUtil.isBlank(deleteCmdPath)) {
-				throw new ConfigurationException("Delete cmd path must not be blank!");
+			if (deleteViaWinRM && StringUtil.isBlank(deleteCmdPath)) {
+				throw new ConfigurationException("Delete path must not be blank!");
 			}
-			if (StringUtil.isBlank(deletePsPath)) {
-				throw new ConfigurationException("Delete ps path must not be blank!");
+			if (deleteViaWinRM && StringUtil.isBlank(deletePsPath)) {
+				throw new ConfigurationException("Delete PS path must not be blank!");
 			}
-			if (StringUtil.isBlank(testCmdPath)) {
-				throw new ConfigurationException("Test cmd path must not be blank!");
+			if (testViaWinRM && StringUtil.isBlank(testCmdPath)) {
+				throw new ConfigurationException("Test path must not be blank!");
 			}
 			if (StringUtil.isBlank(endpoint)) {
 				throw new ConfigurationException("Endpoint must not be blank!");
