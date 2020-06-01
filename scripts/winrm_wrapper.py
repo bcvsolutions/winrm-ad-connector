@@ -66,7 +66,7 @@ def encode(script):
 
 
 # It execute script via WinRM, if no script is send via params it will use default Write-Host for connection test
-def executeScript(endpoint, authentication, user, password, script=None, uid=None):
+def executeScript(endpoint, authentication, user, password, ca_trust_path, ignore_validation=False, script=None, uid=None):
     writeLog("Winrm wrapper start")
 
     # Validate params which are mandatory
@@ -103,23 +103,22 @@ def executeScript(endpoint, authentication, user, password, script=None, uid=Non
         # Encode cmd powershell
         encodedCmd = encode(cmd)
 
-        # Prepare session to WinRM and run script
-        # Need to specify ca_trust_path - its path to the .pem certificate
-        # if you want to point to some other ca path just enter other path instead
-        p = winrm.protocol.Protocol(
-            endpoint=endpoint,
-            transport=authentication,
-            username=user,
-            password=password,
-            ca_trust_path='/opt/connid-connector-server/certs/winrm_ca.pem')
-
-        # use this if you want to use https but you hav issue with crt. ONLY FOR TEST because you are ignoring crt validation
-        # p = winrm.protocol.Protocol(
-        #     endpoint=endpoint,
-        #     transport=authentication,
-        #     username=user,
-        #     password=password,
-        #     server_cert_validation='ignore')
+        if ignore_validation == True:
+            p = winrm.protocol.Protocol(
+                endpoint=endpoint,
+                transport=authentication,
+                username=user,
+                password=password,
+                server_cert_validation='ignore')
+        else:
+            # Prepare session to WinRM and run script
+            # Need to specify ca_trust_path - its path to the .pem certificate
+            p = winrm.protocol.Protocol(
+                endpoint=endpoint,
+                transport=authentication,
+                username=user,
+                password=password,
+                ca_trust_path=ca_trust_path)
 
         # Set out command to env variable beacause cmd has some limit for executing command send via string. This is workaround for executing larger scripts
         shell = p.open_shell(env_vars=dict(WINRM_SCRIPT=encodedScript))

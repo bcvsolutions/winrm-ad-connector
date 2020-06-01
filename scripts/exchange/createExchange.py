@@ -27,7 +27,7 @@ command = command.replace("$depo", winrm_wrapper.getParam("physicalDeliveryOffic
 
 # Call wrapper
 winrm_wrapper.executeScript(os.environ["endpoint"], os.environ["authentication"], os.environ["user"],
-                                    os.environ["password"], command, uid)
+                                    os.environ["password"], os.environ["caTrustPath"], os.environ["ignoreCaValidation"], command, uid)
 
 winrm_wrapper.writeLog("Create end for " + uid)
 print("__UID__=" + uid)

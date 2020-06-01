@@ -47,6 +47,8 @@ public class CmdConfiguration extends ADConfiguration {
 	private String authenticationSchema;
 	private String user;
 	private GuardedString password;
+	private String caTrustPath;
+	private boolean ignoreCaValidation;
 	//	Config which protocol will be used
 	private boolean createViaAd;
 	private boolean createViaWinRM;
@@ -196,9 +198,29 @@ public class CmdConfiguration extends ADConfiguration {
 		this.password = password;
 	}
 
+	@ConfigurationProperty(displayMessageKey = "cmd.caTrustPath.display",
+			helpMessageKey = "cmd.caTrustPath.help", order = 1013)
+	public String getCaTrustPath() {
+		return caTrustPath;
+	}
+
+	public void setCaTrustPath(String caTrustPath) {
+		this.caTrustPath = caTrustPath;
+	}
+
+	@ConfigurationProperty(displayMessageKey = "cmd.ignoreCaValidation.display",
+			helpMessageKey = "cmd.ignoreCaValidation.help", order = 1014)
+	public boolean ignoreCaValidation() {
+		return ignoreCaValidation;
+	}
+
+	public void setIgnoreCaValidation(boolean caTrustPath) {
+		this.ignoreCaValidation = ignoreCaValidation;
+	}
+
 	//	CONFIG properties
 	@ConfigurationProperty(displayMessageKey = "config.create.ad.display",
-			helpMessageKey = "config.create.ad.help", order = 1012)
+			helpMessageKey = "config.create.ad.help", order = 1020)
 	public boolean isCreateViaAd() {
 		return createViaAd;
 	}
@@ -208,7 +230,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.create.winrm.display",
-			helpMessageKey = "config.create.winrm.help", order = 1013)
+			helpMessageKey = "config.create.winrm.help", order = 1021)
 	public boolean isCreateViaWinRM() {
 		return createViaWinRM;
 	}
@@ -218,7 +240,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.update.ad.display",
-			helpMessageKey = "config.update.ad.help", order = 1014)
+			helpMessageKey = "config.update.ad.help", order = 1022)
 	public boolean isUpdateViaAd() {
 		return updateViaAd;
 	}
@@ -228,7 +250,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.update.winrm.display",
-			helpMessageKey = "config.update.winrm.help", order = 1015)
+			helpMessageKey = "config.update.winrm.help", order = 1023)
 	public boolean isUpdateViaWinRM() {
 		return updateViaWinRM;
 	}
@@ -238,7 +260,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.delete.ad.display",
-			helpMessageKey = "config.delete.ad.help", order = 1016)
+			helpMessageKey = "config.delete.ad.help", order = 1024)
 	public boolean isDeleteViaAd() {
 		return deleteViaAd;
 	}
@@ -248,7 +270,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.delete.winrm.display",
-			helpMessageKey = "config.delete.winrm.help", order = 1017)
+			helpMessageKey = "config.delete.winrm.help", order = 1025)
 	public boolean isDeleteViaWinRM() {
 		return deleteViaWinRM;
 	}
@@ -258,7 +280,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.search.ad.display",
-			helpMessageKey = "config.search.ad.help", order = 1018)
+			helpMessageKey = "config.search.ad.help", order = 1026)
 	public boolean isSearchViaAd() {
 		return searchViaAd;
 	}
@@ -268,7 +290,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.search.winrm.display",
-			helpMessageKey = "config.search.winrm.help", order = 1019)
+			helpMessageKey = "config.search.winrm.help", order = 1027)
 	public boolean isSearchViaWinRM() {
 		return searchViaWinRM;
 	}
@@ -278,7 +300,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.test.ad.display",
-			helpMessageKey = "config.test.ad.help", order = 1020)
+			helpMessageKey = "config.test.ad.help", order = 1028)
 	public boolean isTestViaAd() {
 		return testViaAd;
 	}
@@ -288,7 +310,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.test.winrm.display",
-			helpMessageKey = "config.test.winrm.help", order = 1021)
+			helpMessageKey = "config.test.winrm.help", order = 1029)
 	public boolean isTestViaWinRM() {
 		return testViaWinRM;
 	}
@@ -298,7 +320,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.create.first.display",
-			helpMessageKey = "config.create.first.help", order = 1022)
+			helpMessageKey = "config.create.first.help", order = 1030)
 	public boolean isFirstCreateWinRM() {
 		return firstCreateWinRM;
 	}
@@ -308,7 +330,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.update.first.display",
-			helpMessageKey = "config.update.first.help", order = 1023)
+			helpMessageKey = "config.update.first.help", order = 1031)
 	public boolean isFirstUpdateWinRM() {
 		return firstUpdateWinRM;
 	}
@@ -318,7 +340,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.delete.first.display",
-			helpMessageKey = "config.delete.first.help", order = 1024)
+			helpMessageKey = "config.delete.first.help", order = 1032)
 	public boolean isFirstDeleteWinRM() {
 		return firstDeleteWinRM;
 	}
@@ -328,7 +350,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.use.winrm.ldapgroups.display",
-			helpMessageKey = "config.use.winrm.ldapgroups.help", order = 1025)
+			helpMessageKey = "config.use.winrm.ldapgroups.help", order = 1033)
 	public boolean isUseWinRMForLdapGroups() {
 		return useWinRMForLdapGroups;
 	}
@@ -338,7 +360,7 @@ public class CmdConfiguration extends ADConfiguration {
 	}
 
 	@ConfigurationProperty(displayMessageKey = "config.additionalCreds.display",
-			helpMessageKey = "config.additionalCreds.help", order = 1026)
+			helpMessageKey = "config.additionalCreds.help", order = 1034)
 	public GuardedString[] getAdditionalCreds() {
 		if (additionalCreds == null) {
 			return new GuardedString[0];
