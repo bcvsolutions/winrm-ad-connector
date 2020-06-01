@@ -210,11 +210,11 @@ public class CmdConfiguration extends ADConfiguration {
 
 	@ConfigurationProperty(displayMessageKey = "cmd.ignoreCaValidation.display",
 			helpMessageKey = "cmd.ignoreCaValidation.help", order = 1014)
-	public boolean ignoreCaValidation() {
+	public boolean isIgnoreCaValidation() {
 		return ignoreCaValidation;
 	}
 
-	public void setIgnoreCaValidation(boolean caTrustPath) {
+	public void setIgnoreCaValidation(boolean ignoreCaValidation) {
 		this.ignoreCaValidation = ignoreCaValidation;
 	}
 
