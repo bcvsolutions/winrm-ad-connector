@@ -353,9 +353,12 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 				new CmdExecuteQuery(oc, cmdConfiguration.getSearchCmdPath(), filter, connectorObject -> {
 					String uidValue = connectorObject.getUid().getUidValue();
 					if (results.containsKey(uidValue)) {
-						Set<Attribute> attributes = new HashSet<>();
-						attributes.addAll(results.get(uidValue).getAttributes());
-						attributes.addAll(connectorObject.getAttributes());
+						Set<Attribute> attributes = new HashSet<>(results.get(uidValue).getAttributes());
+
+						// Filter out __NAME__ attribute, because we want to have AD value in this attribtue
+						Set<Attribute> winRMAttrs = connectorObject.getAttributes();
+						List<Attribute> filtered = winRMAttrs.stream().filter(attribute -> !"__NAME__".equals(attribute.getName())).collect(Collectors.toList());
+						attributes.addAll(filtered);
 
 						ConnectorObject o = new ConnectorObject(ObjectClass.ACCOUNT, attributes);
 						results.put(uidValue, o);
