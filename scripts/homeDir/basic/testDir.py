@@ -10,7 +10,7 @@ winrm_wrapper.writeLog("Test start")
 
 # Call wrapper
 winrm_wrapper.executeScript(os.environ["endpoint"], os.environ["authentication"], os.environ["user"],
-                                    os.environ["password"])
+                                    os.environ["password"], os.environ["caTrustPath"], os.environ["ignoreCaValidation"])
 
 winrm_wrapper.writeLog("Test end")
 sys.exit()

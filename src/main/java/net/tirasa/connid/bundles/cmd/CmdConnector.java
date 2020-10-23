@@ -75,6 +75,7 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 
 	private static final Log LOG = Log.getLog(CmdConnector.class);
 	private static final String SCRIPT_ATT_NAME = "script";
+	private static final String ATT_FOR_WINRM = "attributesForWinRM";
 
 	private CmdConfiguration cmdConfiguration;
 	private ADConnector adConnector = new ADConnector();
@@ -100,8 +101,100 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 		Uid uidAd = null;
 		Uid uidWinrm = null;
 
+		logOk(oc, attributes, oo, "Create");
+
+		Set<Attribute> adAttributes = new HashSet<>(attributes);
+		if (cmdConfiguration.isUseWinRMForLdapGroups()) {
+			LOG.info("Update of ldapGroups only via WinRM is on, removing ldapGroups from attributes for AD");
+			removeAttribute(adAttributes, "ldapGroups");
+		}
+		LOG.info("Remove attributes ldapGroupsToAdd, ldapGroupsToRemove if they are there for AD");
+		removeAttribute(adAttributes, "ldapGroupsToAdd");
+		removeAttribute(adAttributes, "ldapGroupsToRemove");
+
+		Set<Attribute> winrmAttributes = copyAttributesAndAddAdditionalCreds(attributes);
+
+		removeWinrmAttributes(oo, adAttributes);
+
+		if (executeAdThenWinrm()) {
+			uidAd = adConnector.create(oc, adAttributes, oo);
+			LOG.info("Create on AD was executed");
+			uidWinrm = createWinrm(oc, winrmAttributes, oo);
+			LOG.info("Create via WinRM was executed");
+		} else if (executeWinrmThenAd()) {
+			uidWinrm = createWinrm(oc, winrmAttributes, oo);
+			LOG.info("Create via WinRM was executed");
+			uidAd = adConnector.create(oc, adAttributes, oo);
+			LOG.info("Create on AD was executed");
+		} else if (executeOnlyAd()) {
+			uidAd = adConnector.create(oc, adAttributes, oo);
+		} else if (executeOnlyWinrm()) {
+			uidWinrm = createWinrm(oc, winrmAttributes, oo);
+		}
+
+		return checkAndGetUid(uidAd, uidWinrm, "create");
+	}
+
+	@Override
+	public Uid update(final ObjectClass oc, final Uid uid, final Set<Attribute> attributes, final OperationOptions oo) {
+		Uid uidAd = null;
+		Uid uidWinrm = null;
+
+		logOk(oc, attributes, oo, "Update");
+
+		Set<Attribute> adAttributes = new HashSet<>(attributes);
+		if (cmdConfiguration.isUseWinRMForLdapGroups()) {
+			LOG.info("Update of ldapGroups only via WinRM is on, removing ldapGroups from attributes for AD, user:{0}", uid);
+			removeAttribute(adAttributes, "ldapGroups");
+		}
+		LOG.info("Remove attributes ldapGroupsToAdd, ldapGroupsToRemove if they are there for AD, user:{0}", uid);
+		removeAttribute(adAttributes, "ldapGroupsToAdd");
+		removeAttribute(adAttributes, "ldapGroupsToRemove");
+		LOG.info("Remove domain:* attributes which contain credentials for different domain if they are there for AD, user:{0}", uid);
+		removeCredentialsAttributes(adAttributes);
+
+		Set<Attribute> winrmAttributes = copyAttributesAndAddAdditionalCreds(attributes);
+
+		removeWinrmAttributes(oo, adAttributes);
+
+		if (executeAdThenWinrm()) {
+			uidAd = adConnector.update(oc, uid, adAttributes, oo);
+			LOG.info("Update on AD was executed");
+			uidWinrm = updateWinrm(oc, uid, winrmAttributes);
+			LOG.info("Update via WinRM was executed");
+		} else if (executeWinrmThenAd()) {
+			uidWinrm = updateWinrm(oc, uid, winrmAttributes);
+			LOG.info("Update via WinRM was executed");
+			uidAd = adConnector.update(oc, uid, adAttributes, oo);
+			LOG.info("Update on AD was executed");
+		} else if (executeOnlyAd()) {
+			uidAd = adConnector.update(oc, uid, adAttributes, oo);
+		} else if (executeOnlyWinrm()) {
+			uidWinrm = updateWinrm(oc, uid, winrmAttributes);
+		}
+
+		return checkAndGetUid(uidAd, uidWinrm, "update");
+	}
+
+	private boolean executeAdThenWinrm() {
+		return cmdConfiguration.isCreateViaAd() && !cmdConfiguration.isFirstCreateWinRM() && cmdConfiguration.isCreateViaWinRM();
+	}
+
+	private boolean executeWinrmThenAd() {
+		return cmdConfiguration.isCreateViaAd() && cmdConfiguration.isFirstCreateWinRM() && cmdConfiguration.isCreateViaWinRM();
+	}
+
+	private boolean executeOnlyAd() {
+		return cmdConfiguration.isCreateViaAd() && !cmdConfiguration.isCreateViaWinRM();
+	}
+
+	private boolean executeOnlyWinrm() {
+		return !cmdConfiguration.isCreateViaAd() && cmdConfiguration.isCreateViaWinRM();
+	}
+
+	private void logOk(ObjectClass oc, Set<Attribute> attributes, OperationOptions oo, String operation) {
 		if (LOG.isOk()) {
-			LOG.ok("Create parameters:");
+			LOG.ok(operation + " parameters:");
 			LOG.ok("ObjectClass {0}", oc.getObjectClassValue());
 
 			for (Attribute attr : attributes) {
@@ -115,35 +208,22 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 				}
 			}
 		}
+	}
 
-		Set<Attribute> adAttributes = new HashSet<>(attributes);
-		if (cmdConfiguration.isUseWinRMForLdapGroups()) {
-			LOG.info("Update of ldapGroups only via WinRM is on, removing ldapGroups from attributes for AD");
-			removeAttribute(adAttributes, "ldapGroups");
+	private void removeWinrmAttributes(OperationOptions oo, Set<Attribute> attributes) {
+		if (oo != null && oo.getOptions() != null && oo.getOptions().containsKey(ATT_FOR_WINRM)) {
+			LOG.info("We will filter AD attributes, because operation options are set");
+			// array or simple string
+			Object value = oo.getOptions().get(ATT_FOR_WINRM);
+			if (value instanceof String) {
+				removeAttribute(attributes, String.valueOf(value));
+			} else if (value instanceof String[]) {
+				List<String> attributesForWinRM = Arrays.asList((String[]) oo.getOptions().get(ATT_FOR_WINRM));
+				attributesForWinRM.forEach(nameForRemove -> removeAttribute(attributes, nameForRemove));
+			} else {
+				LOG.info("Config is not String nor String[] can't perform filtering");
+			}
 		}
-		LOG.info("Remove attributes ldapGroupsToAdd, ldapGroupsToRemove if they are there for AD");
-		removeAttribute(adAttributes, "ldapGroupsToAdd");
-		removeAttribute(adAttributes, "ldapGroupsToRemove");
-
-		Set<Attribute> winrmAttributes = addAdditionalCredsToAttrs(attributes);
-
-		if (cmdConfiguration.isCreateViaAd() && !cmdConfiguration.isFirstCreateWinRM() && cmdConfiguration.isCreateViaWinRM()) {
-			uidAd = adConnector.create(oc, adAttributes, oo);
-			LOG.info("Create on AD was executed");
-			uidWinrm = createWinrm(oc, winrmAttributes, oo);
-			LOG.info("Create via WinRM was executed");
-		} else if (cmdConfiguration.isCreateViaAd() && cmdConfiguration.isFirstCreateWinRM() && cmdConfiguration.isCreateViaWinRM()) {
-			uidWinrm = createWinrm(oc, winrmAttributes, oo);
-			LOG.info("Create via WinRM was executed");
-			uidAd = adConnector.create(oc, adAttributes, oo);
-			LOG.info("Create on AD was executed");
-		} else if (cmdConfiguration.isCreateViaAd() && !cmdConfiguration.isCreateViaWinRM()) {
-			uidAd = adConnector.create(oc, adAttributes, oo);
-		} else if (!cmdConfiguration.isCreateViaAd() && cmdConfiguration.isCreateViaWinRM()) {
-			uidWinrm = createWinrm(oc, winrmAttributes, oo);
-		}
-
-		return checkAndGetUid(uidAd, uidWinrm, "create");
 	}
 
 	private Uid createWinrm(ObjectClass oc, Set<Attribute> attributes, OperationOptions oo) {
@@ -152,73 +232,23 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 		return new CmdCreate(oc, cmdConfiguration.getCreateCmdPath(), attributesWithConfig).execCreateCmd();
 	}
 
-	@Override
-	public Uid update(final ObjectClass oc, final Uid uid, final Set<Attribute> attributes, final OperationOptions oo) {
-		Uid uidAd = null;
-		Uid uidWinrm = null;
-
-		if (LOG.isOk()) {
-			LOG.ok("Update parameters:");
-			LOG.ok("ObjectClass {0}", oc.getObjectClassValue());
-			LOG.ok("Uid: {0}", uid.getUidValue());
-			for (Attribute attr : attributes) {
-				LOG.ok("Attribute {0}: {1}", attr.getName(), attr.getValue());
-			}
-			if (oo != null) {
-				for (Map.Entry<String, Object> entrySet : oo.getOptions().entrySet()) {
-					LOG.ok("   > OperationOptions {0}", entrySet.getKey() + ": " + entrySet.getValue());
-				}
-			}
-		}
-		Set<Attribute> adAttributes = new HashSet<>(attributes);
-		if (cmdConfiguration.isUseWinRMForLdapGroups()) {
-			LOG.info("Update of ldapGroups only via WinRM is on, removing ldapGroups from attributes for AD, user:{0}", uid);
-			removeAttribute(adAttributes, "ldapGroups");
-		}
-		LOG.info("Remove attributes ldapGroupsToAdd, ldapGroupsToRemove if they are there for AD, user:{0}", uid);
-		removeAttribute(adAttributes, "ldapGroupsToAdd");
-		removeAttribute(adAttributes, "ldapGroupsToRemove");
-		LOG.info("Remove domain:* attributes which contain credentials for different domain if they are there for AD, user:{0}", uid);
-		removeCredentialsAttributes(adAttributes);
-
-		Set<Attribute> winrmAttributes = addAdditionalCredsToAttrs(attributes);
-
-		if (cmdConfiguration.isUpdateViaAd() && !cmdConfiguration.isFirstUpdateWinRM() && cmdConfiguration.isUpdateViaWinRM()) {
-			uidAd = adConnector.update(oc, uid, adAttributes, oo);
-			LOG.info("Update on AD was executed");
-			uidWinrm = updateWinrm(oc, uid, winrmAttributes);
-			LOG.info("Update via WinRM was executed");
-		} else if (cmdConfiguration.isUpdateViaAd() && cmdConfiguration.isFirstUpdateWinRM() && cmdConfiguration.isUpdateViaWinRM()) {
-			uidWinrm = updateWinrm(oc, uid, winrmAttributes);
-			LOG.info("Update via WinRM was executed");
-			uidAd = adConnector.update(oc, uid, adAttributes, oo);
-			LOG.info("Update on AD was executed");
-		} else if (cmdConfiguration.isUpdateViaAd() && !cmdConfiguration.isUpdateViaWinRM()) {
-			uidAd = adConnector.update(oc, uid, adAttributes, oo);
-		} else if (!cmdConfiguration.isUpdateViaAd() && cmdConfiguration.isUpdateViaWinRM()) {
-			uidWinrm = updateWinrm(oc, uid, winrmAttributes);
-		}
-
-		return checkAndGetUid(uidAd, uidWinrm, "update");
-	}
-
-	private Set<Attribute> addAdditionalCredsToAttrs(Set<Attribute> attributes) {
+	private Set<Attribute> copyAttributesAndAddAdditionalCreds(Set<Attribute> attributes) {
 		LOG.info("Adding additional creds from config to script attributes");
 		Set<Attribute> resultAttributes = new HashSet<>(attributes);
 		resultAttributes.add(AttributeBuilder.build("additionalCreds", Arrays.stream(cmdConfiguration.getAdditionalCreds()).map(this::getPassword).collect(Collectors.toList())));
 		return resultAttributes;
 	}
 
-	private void removeAttribute(Set<Attribute> adAttributes, String attrName) {
-		Attribute ldapGroups = AttributeUtil.find(attrName, adAttributes);
-		if (ldapGroups != null) {
-			adAttributes.remove(ldapGroups);
+	private void removeAttribute(Set<Attribute> attributes, String attrName) {
+		Attribute attribute = AttributeUtil.find(attrName, attributes);
+		if (attribute != null) {
+			attributes.remove(attribute);
 		}
 	}
 
-	private void removeCredentialsAttributes(Set<Attribute> adAttributes) {
-		List<Attribute> credAttributes = adAttributes.stream().filter(attribute -> attribute.getName().startsWith("domain:")).collect(Collectors.toList());
-		credAttributes.forEach(adAttributes::remove);
+	private void removeCredentialsAttributes(Set<Attribute> attributes) {
+		List<Attribute> credAttributes = attributes.stream().filter(attribute -> attribute.getName().startsWith("domain:")).collect(Collectors.toList());
+		credAttributes.forEach(attributes::remove);
 	}
 
 	private Uid updateWinrm(ObjectClass oc, Uid uid, Set<Attribute> attributes) {
@@ -323,9 +353,12 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 				new CmdExecuteQuery(oc, cmdConfiguration.getSearchCmdPath(), filter, connectorObject -> {
 					String uidValue = connectorObject.getUid().getUidValue();
 					if (results.containsKey(uidValue)) {
-						Set<Attribute> attributes = new HashSet<>();
-						attributes.addAll(results.get(uidValue).getAttributes());
-						attributes.addAll(connectorObject.getAttributes());
+						Set<Attribute> attributes = new HashSet<>(results.get(uidValue).getAttributes());
+
+						// Filter out __NAME__ attribute, because we want to have AD value in this attribtue
+						Set<Attribute> winRMAttrs = connectorObject.getAttributes();
+						List<Attribute> filtered = winRMAttrs.stream().filter(attribute -> !"__NAME__".equals(attribute.getName())).collect(Collectors.toList());
+						attributes.addAll(filtered);
 
 						ConnectorObject o = new ConnectorObject(ObjectClass.ACCOUNT, attributes);
 						results.put(uidValue, o);
@@ -354,7 +387,7 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 			attributes.remove(member);
 
 			List<Object> valueFromFilter = new ArrayList<>();
-			String userDn = operand.getNativeFilter().substring(operand.getNativeFilter().indexOf("=") + 1, operand.getNativeFilter().indexOf(")"));
+			String userDn = operand.getNativeFilter().substring(operand.getNativeFilter().indexOf('=') + 1, operand.getNativeFilter().indexOf(')'));
 			valueFromFilter.add(unEscapeStringAttrValue(userDn));
 
 			attributes.add(AttributeBuilder.build(member.getName(), valueFromFilter));
@@ -478,6 +511,8 @@ public class CmdConnector implements TestOp, PoolableConnector, SchemaOp, Search
 		attributes.add(AttributeBuilder.build("authentication", cmdConfiguration.getAuthenticationSchema()));
 		attributes.add(AttributeBuilder.build("user", cmdConfiguration.getUser()));
 		attributes.add(AttributeBuilder.build("password", getPassword(cmdConfiguration.getPassword())));
+		attributes.add(AttributeBuilder.build("caTrustPath", cmdConfiguration.getCaTrustPath()));
+		attributes.add(AttributeBuilder.build("ignoreCaValidation", cmdConfiguration.isIgnoreCaValidation()));
 		return attributes;
 	}
 

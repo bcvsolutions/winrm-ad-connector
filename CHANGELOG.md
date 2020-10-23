@@ -3,7 +3,11 @@
 ##### TODO - [1.0.5]
 * new versions of com.fasterxml.jackson.core libs. jackson-databind had some vulnerability in version 2.9.8. We used this opportunity
 to update all jackson dependencies to latest versions
-
+* Path to certificate which is used for SSL WinRM communication can be set via connector configuration
+* SEVERE log message is print to log only if some error occurs. Previously it was logged every time even with empty body.
+* Connector accepts OperationalOptions and filter attributes if some of them is only for WinRM part.
+* You don't need to fill path to all script. Now filled path is only checked for the operations which you selected.
+* If you search by AD and WinRM together, \_\_NAME\_\_ attribute is used from AD. 
 
 ##### 15.04.2020 - [1.0.4]
 * New feature of configuration options for WinRM service, path to powershell scripts, which type of connection will be used and 
