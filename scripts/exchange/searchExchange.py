@@ -22,7 +22,7 @@ command = command.replace("$uid", uid)
 
 # Call wrapper
 winrm_wrapper.executeScript(os.environ["endpoint"], os.environ["authentication"], os.environ["user"],
-                                    os.environ["password"], command, uid)
+                                    os.environ["password"], os.environ["caTrustPath"], os.environ["ignoreCaValidation"], command, uid)
 
 winrm_wrapper.writeLog("Search end for " + uid)
 sys.exit()
