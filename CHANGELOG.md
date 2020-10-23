@@ -1,9 +1,10 @@
 # CHANGELOG
 
-##### TODO - [1.0.5]
+##### 23.10.2020 - [1.0.5]
 * new versions of com.fasterxml.jackson.core libs. jackson-databind had some vulnerability in version 2.9.8. We used this opportunity
 to update all jackson dependencies to latest versions
-* Path to certificate which is used for SSL WinRM communication can be set via connector configuration
+* Path to certificate which is used for SSL WinRM communication can be set via connector configuration together with the option to skip certification validation
+You need to update your python scripts and winrm_wrapper.py if you want to use this new configuration options. If you leave your scripts without changes it will work as in previous versions.
 * SEVERE log message is print to log only if some error occurs. Previously it was logged every time even with empty body.
 * Connector accepts OperationalOptions and filter attributes if some of them is only for WinRM part.
 * You don't need to fill path to all script. Now filled path is only checked for the operations which you selected.
