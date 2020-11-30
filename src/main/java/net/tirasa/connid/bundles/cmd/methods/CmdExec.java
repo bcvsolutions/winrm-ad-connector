@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -146,7 +147,7 @@ public abstract class CmdExec {
 
 	private String getInputStream(InputStream stream) {
 		String output = "";
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
 			if (br.ready()) {
 				output = br.lines().collect(Collectors.joining(System.lineSeparator()));
 			}
