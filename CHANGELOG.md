@@ -1,5 +1,8 @@
 # CHANGELOG
 
+##### 01.12.2020 - [1.0.6]
+* Reading output from script as UTF-8 to prevent issues on Windows and default coding
+
 ##### 23.10.2020 - [1.0.5]
 * new versions of com.fasterxml.jackson.core libs. jackson-databind had some vulnerability in version 2.9.8. We used this opportunity
 to update all jackson dependencies to latest versions
