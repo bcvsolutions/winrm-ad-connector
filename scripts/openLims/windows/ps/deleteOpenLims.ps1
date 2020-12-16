@@ -2,7 +2,7 @@
 # INPUT:
 #   uid - String - account identifier
 
-$openLimsPath = "C:\OpenLims\idmlims_new"
+$openLimsPath = "C:\OpenLims"
 
 Write-Output "PS Delete started"
 try

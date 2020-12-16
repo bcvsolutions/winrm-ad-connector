@@ -13,7 +13,7 @@ function checkForErrors
     }
 }
 
-$openLimsPath = "C:\OpenLims\idmlims_new"
+$openLimsPath = "C:\OpenLims"
 
 Write-Output "PS Search started"
 try

@@ -26,7 +26,7 @@ function checkForErrors
     }
 }
 
-$openLimsPath = "C:\OpenLims\idmlims_new"
+$openLimsPath = "C:\OpenLims"
 
 #Write-Host "PS Create started"
 try
