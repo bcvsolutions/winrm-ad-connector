@@ -1,4 +1,3 @@
-#! python
 # -*- coding: utf-8 -*-
 # All params from IdM is stored in environment and you can get them by os.environ["paramName"]
 import sys, os
