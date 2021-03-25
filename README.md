@@ -16,7 +16,7 @@ PS scripts are in subfolders:
 * scripts - These scripts can be used for WinRM+AD connector running on the system with default Python 2 (e.g. CentOS 7).
 * scripts_python3 - These scripts can be used for WinRM+AD connector running on the system with default Python 3 (e.g. CentOS 8) or when using the appliance BCV Greeno - identity platform. These scripts require minimal version of WinRM+AD connector to be 1.0.6 and support the configuration options introduced in 1.0.5.
 
-More details - https://wiki.czechidm.com/devel/documentation/adm/systems/dev/winrm_ad_connector
+More details - https://wiki.czechidm.com/devel/documentation/adm/systems/winrm_ad_connector
 
 For build you can use this command  
 ``$ mvn clean install -Dlicense.skip=true``  
